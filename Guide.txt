@@ -1,0 +1,5 @@
+Module 4 - Team 1: Crush 3
+
+Tile Variety Update
+1. Add initializations on Board.lua
+2. Update variable parameters passin on Play and Begin state that concerns the board.

@@ -73,6 +73,8 @@ function PlayState:update(dt)
         love.event.quit()
     end
 
+    --M4-T1
+    self.board:update(dt)
     -- go back to start if time runs out
     if self.timer <= 0 then
         -- clear timers from prior PlayStates

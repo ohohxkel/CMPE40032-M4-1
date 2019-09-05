@@ -24,10 +24,21 @@ function Tile:init(x, y, color, variety)
     -- tile appearance/points
     self.color = color
     self.variety = variety
+    self.shiny = math.random(1, 10) == 1 and true or false
+
+
+    --M4-T1: Emits particle, recognizable as a shiny tile
+    self.psystem = love.graphics.newParticleSystem(love.graphics.newImage('graphics/particle.png'), 64)
+    self.psystem:setParticleLifetime(1, 3)
+    self.psystem:setEmissionRate(6)
+    self.psystem:setLinearAcceleration(-10, 0, 10, 20)
+    self.psystem:setAreaSpread('normal', 6, 6)
+    self.psystem:setColors(255,215,0,255,241,156,187,255)
+    self.psystem:emit(6)
 end
 
 function Tile:update(dt)
-
+    self.psystem:update(dt)
 end
 
 --[[
@@ -47,4 +58,7 @@ function Tile:render(x, y)
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.draw(gTextures['main'], gFrames['tiles'][self.color][self.variety],
         self.x + x, self.y + y)
+    if self.shiny then
+        love.graphics.draw(self.psystem, self.x + x + 16, self.y + y + 12)
+        end
 end
