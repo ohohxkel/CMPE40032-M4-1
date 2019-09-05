@@ -12,15 +12,36 @@
 
 Board = Class{}
 
-function Board:init(x, y)
+function Board:init(x, y, level)
     self.x = x
     self.y = y
     self.matches = {}
+    
+    --M4-T1: Initialize level and tile variety identifier
+    self.level = level
+    self.tilesVariety = 6
 
     self:initializeTiles()
 end
 
 function Board:initializeTiles()
+
+    --M4-T1: Randomizing of tile variety above level 6
+    for i = 1, 6 do
+        if self.level < 6 then
+            self.tilesVariety = self.level
+        --M4-T1: For every level divisible by ten, level will go full blast for extra challenge
+        elseif self.level / 10 then
+            self.tilesVariety = 6
+        --M4-T1: For normal levels, variety will depend on what level they are in.
+        elseif self.level / i then
+            self.tilesVariety = i
+        else   
+            self.tilesVariety = 6
+        end
+    end
+
+
     self.tiles = {}
 
     for tileY = 1, 8 do
@@ -30,7 +51,8 @@ function Board:initializeTiles()
 
         for tileX = 1, 8 do
             -- create a new tile at X,Y with a random color and variety
-            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(6)))
+            --M4-T1: Pass the variable.
+            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(self.tilesVariety)))
         end
     end
 
@@ -226,7 +248,8 @@ function Board:getFallingTiles()
 
             -- if the tile is nil, we need to add a new one
             if not tile then
-                local tile = Tile(x, y, math.random(18), math.random(6))
+                --M4-T1: Pass the variable.
+                local tile = Tile(x, y, math.random(18), math.random(self.tilesVariety))
                 tile.y = -32
                 self.tiles[y][x] = tile
 
