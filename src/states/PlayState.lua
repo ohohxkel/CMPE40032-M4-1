@@ -260,7 +260,15 @@ function PlayState:calculateMatches()
         end)
     -- if no matches, we can continue playing
     else
-        self.canInput = true
+        if not self.board:matchesAvailable() then 
+            self.printResetMessage = true 
+            Timer.after(2.5, function ()
+                self.printResetMessage = false 
+            end 
+        )
+        self.board: initializeTiles()
+    end 
+            self.canInput = true
     end
 end
 
