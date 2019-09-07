@@ -119,8 +119,26 @@ function PlayState:update(dt)
             gSounds['select']:play()
         end
 
+         -- M4 - Mouse locates the cursor 
+         if not self.isKeyboard then
+            local mouseCursorX, mouseCursorY = push:toGame(love.mouse.getPosition())
+            local mouseCursorX = mouseCursorX - (VIRTUAL_WIDTH - 272)
+            local mouseCursorY = mouseCursorY - 16
+        
+            if mouseCursorX >= 0 and mouseCursorX <= 255
+            and mouseCursorY >= 0 and mouseCursorY <= 255 then
+        
+                local mouseCursorGridX = math.floor(mouseCursorX / 32)
+                local mouseCursorGridY = math.floor(mouseCursorY / 32)
+        
+                self.boardHighlightX = mouseCursorGridX
+                self.boardHighlightY = mouseCursorGridY
+             end
+        end
+
+
         -- if we've pressed enter, to select or deselect a tile...
-        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') or love.mouse.wasPressed(1) then
             -- if same tile as currently highlighted, deselect
             local x = self.boardHighlightX + 1
             local y = self.boardHighlightY + 1
