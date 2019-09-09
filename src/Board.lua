@@ -357,3 +357,68 @@ function Board:render()
         end
     end
 end
+
+function Board:findMatches()
+    
+    local matchTable = {}
+
+    for x = 1, 8 do
+        for y = 1, 8 do
+            local x2 = x
+            local y2 = y
+
+            for y2 = y - 1, y + 1, 2 do
+                if y2 < 1 or y2 > 8 then
+                    break
+                end
+
+                local testBoard = Class.clone(self)
+                local tile = testBoard.tiles[y][x]
+                local newTile = testBoard.tiles[y2][x]
+
+                newTile = testBoard.tiles[newTile.gridY][newTile.gridX]
+
+                tempTile = testBoard.tiles[tile.gridY][tile.gridX]
+
+                testBoard.tiles[tile.gridY][tile.gridX] = newTile
+                testBoard.tiles[newTile.gridY][newTile.gridX] = tempTile
+
+                local matches = testBoard:calculateMatches()
+
+                if type(matches) == 'table' then
+                    table.insert(matchTable, {x..","..y, x..","..y2})
+                end
+            end
+
+            y2 = y
+
+            for x2 = x - 1, x + 1, 2 do
+                if x2 < 1 or x2 > 8  then
+                    break
+                end
+
+                local testBoard = Class.clone(self)
+                local tile = testBoard.tiles[y][x]
+                local newTile = testBoard.tiles[y][x2]
+
+                newTile = testBoard.tiles[newTile.gridY][newTile.gridX]
+
+                tempTile = testBoard.tiles[tile.gridY][tile.gridX]
+
+                testBoard.tiles[tile.gridY][tile.gridX] = newTile
+                testBoard.tiles[newTile.gridY][newTile.gridX] = tempTile
+
+                if type(matches) == 'table' then
+                    table.insert(matchTable, {x..","..y, x2..","..y})
+                end
+            end
+        end
+    end
+
+    return matchTable
+end
+
+function Board:check()
+    local matches = self:findMatches()
+    print_r(matches)
+end
