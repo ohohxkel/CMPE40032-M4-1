@@ -28,6 +28,7 @@ function Tile:init(x, y, color, variety)
 
 
     --M4-T1: Emits particle, recognizable as a shiny tile
+    --File license: <a href="https://pngtree.com/free-vectors">free vectors from pngtree.com</a>
     self.psystem = love.graphics.newParticleSystem(love.graphics.newImage('graphics/particle.png'), 64)
     self.psystem:setParticleLifetime(1, 3)
     self.psystem:setEmissionRate(6)
