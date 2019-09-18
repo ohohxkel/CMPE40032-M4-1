@@ -119,8 +119,26 @@ function PlayState:update(dt)
             gSounds['select']:play()
         end
 
+         -- M4 - Mouse locates the cursor 
+         if not self.isKeyboard then
+            local mouseCursorX, mouseCursorY = push:toGame(love.mouse.getPosition())
+            local mouseCursorX = mouseCursorX - (VIRTUAL_WIDTH - 272)
+            local mouseCursorY = mouseCursorY - 16
+        
+            if mouseCursorX >= 0 and mouseCursorX <= 255
+            and mouseCursorY >= 0 and mouseCursorY <= 255 then
+        
+                local mouseCursorGridX = math.floor(mouseCursorX / 32)
+                local mouseCursorGridY = math.floor(mouseCursorY / 32)
+        
+                self.boardHighlightX = mouseCursorGridX
+                self.boardHighlightY = mouseCursorGridY
+             end
+        end
+
+
         -- if we've pressed enter, to select or deselect a tile...
-        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') or love.mouse.wasPressed(1) then
             -- if same tile as currently highlighted, deselect
             local x = self.boardHighlightX + 1
             local y = self.boardHighlightY + 1
@@ -163,7 +181,36 @@ function PlayState:update(dt)
                 })
                 -- once the swap is finished, we can tween falling blocks as needed
                 :finish(function()
-                    self:calculateMatches()
+                    -- M4
+                    local highlightedTile = self.highlightedTile 
+
+                    if not self:calculateMatches() then
+                        gSounds['error']:play()
+                        self.highlightedTile = nil
+                        Timer.after(0.25, function() 
+                            
+                            -- swap grid positions of tiles
+                             local tempX = highlightedTile.gridX
+                             local tempY = highlightedTile.gridY
+
+                            highlightedTile.gridX = newTile.gridX
+                            highlightedTile.gridY = newTile.gridY
+                            newTile.gridX = tempX
+                            newTile.gridY = tempY
+                        
+                        --swap tile in tables 
+                        self.board.tiles[highlightedTile.gridY][highlightedTile.gridX] = highlightedTile
+                      
+                        self.board.tiles[newTile.gridY][newTile.gridX] = newTile
+
+                        Timer.tween(0.1,{
+                            [highlightedTile] = {x = newTile.x,y = newTile.y},
+                            [newTile] = {x = highlightedTile.x,y = highlightedTile.y}
+                        })
+                    end)
+            end
+            self.board:check()
+            self.caninput = true 
                 end)
             end
         end
@@ -213,7 +260,15 @@ function PlayState:calculateMatches()
         end)
     -- if no matches, we can continue playing
     else
-        self.canInput = true
+        if not self.board:matchesAvailable() then 
+            self.printResetMessage = true 
+            Timer.after(2.5, function ()
+                self.printResetMessage = false 
+            end 
+        )
+        self.board: initializeTiles()
+    end 
+            self.canInput = true
     end
 end
 
